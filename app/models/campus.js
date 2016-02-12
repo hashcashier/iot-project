@@ -7,4 +7,4 @@ var CampusSchema = new Schema({
 	registered: {type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Campus', UserSchema);
+module.exports = mongoose.model('Campus', CampusSchema);

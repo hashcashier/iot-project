@@ -9,4 +9,4 @@ var LocationSchema = new Schema({
 	registered: {type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Campus', UserSchema);
+module.exports = mongoose.model('Location', LocationSchema);
