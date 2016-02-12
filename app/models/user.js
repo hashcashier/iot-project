@@ -7,6 +7,7 @@ var bcrypt = require('bcrypt-nodejs');
 var UserSchema = new Schema({
 	fbid: {type: String, required: true, index: { unique: true }},
 	name: String,
+	registered: {type: Date, default: Date.now }
 });
 
 // return the model

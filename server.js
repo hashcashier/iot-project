@@ -27,8 +27,12 @@ app.use(morgan('dev'))
 
 //app.use('/api', apiRoutes);
 
-app.get('*', function(req, res) {
+app.get('/', function(req, res) {
 	res.sendFile(path.join(__dirname + '/public/app/views/index.html'));
+});
+
+app.get('*', function(req, res) {
+	res.status(404).send("File not found.");
 });
 
 app.listen(config.port);
