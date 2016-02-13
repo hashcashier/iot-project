@@ -1,39 +1,30 @@
-var express = require('express'); // call express
-var app = express(); // define our app using express
-var config = require('./config');
-var path = require('path');
+var express = require('express');
+var app 	= express();
+var config 	= require('./config/app');
 
-var bodyParser = require('body-parser'); // get body-parser
-var morgan = require('morgan'); // used to see requests
-var mongoose = require('mongoose'); // for working w/ our database
+var passport		= require('passport');
+var cookieParser 	= require('cookie-parser');
+var bodyParser 		= require('body-parser');
+var session 		= require('express-session');
+var morgan 			= require('morgan');
 
-mongoose.connect(config.database);
+var mongoose 	= require('mongoose');
+var configMongo = require('./config/db');
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-app.use(function(req, res, next) {
-	res.setHeader('Access-Control-Allow-Origin', '*');
-	res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, Authorization');
-	next();
-});
-
-app.use(express.static(__dirname + '/public'));
+mongoose.connect(configMongo.database);
 
 app.use(morgan('dev'))
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cookieParser());
 
-//var apiRoutes = require('./app/routes/api')(app, express);
+require('./config/passport')(passport);
 
-//app.use('/api', apiRoutes);
+app.use(session({ secret: config.secret }));
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.get('/', function(req, res) {
-	res.sendFile(path.join(__dirname + '/public/app/views/index.html'));
-});
-
-app.get('*', function(req, res) {
-	res.status(404).send("File not found.");
-});
+require('./app/routes/routes.js')(app, __dirname, express, passport);
 
 app.listen(config.port);
-console.log('Magic happens on port ' + config.port);
+console.log('Server started on port ' + config.port);
