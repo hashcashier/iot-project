@@ -24,7 +24,8 @@ app.use(session({ secret: config.secret }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-require('./app/routes/routes.js')(app, __dirname, express, passport);
+app.set('rootpath', __dirname);
+require('./app/routes/routes.js')(app, express, passport);
 
 app.listen(config.port);
 console.log('Server started on port ' + config.port);

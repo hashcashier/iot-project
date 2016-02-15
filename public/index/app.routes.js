@@ -3,7 +3,7 @@ angular.module('app.routes', ['ngRoute'])
 		$routeProvider
 		// home page route
 			.when('/', {
-				templateUrl : 'views/pages/home.html'
+				templateUrl : 'index/views/pages/home.html'
 			});
 		// get rid of the hash in the URL
 		$locationProvider.html5Mode(true);
