@@ -43,6 +43,3 @@ module.exports = function(app, express) {
 		res.status(400).send("Client made a bad request to the server.");
 	});
 };
-
-function isTokenBearer(req, res, next) {
-}

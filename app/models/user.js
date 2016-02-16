@@ -1,7 +1,9 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-
 var bcrypt = require('bcrypt-nodejs');
+
+var Friendship = require('./friendship');
+var LocationHistory = require('./locationHistory');
 
 var UserSchema = new Schema({
 	username: { type: String, required: true, index: { unique: true }},
@@ -22,6 +24,16 @@ UserSchema.pre('save', function(next) {
 UserSchema.methods.comparePassword = function(password) {
 	var user = this;
 	return bcrypt.compareSync(password, user.password);
+};
+
+UserSchema.methods.isFriendsWith = function(friend) {
+	var user = this;
+	return Friendship.findOne({user: user._id, friend: friend._id}).count() > 0;
+};
+
+UserSchema.methods.getLastLocation = function(callback) {
+	var user = this;
+	LocationHistory.find({user_id: user._id}).sort({registered: -1}).limit(1).exec(callback);
 };
 
 module.exports = mongoose.model('User', UserSchema);

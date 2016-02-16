@@ -1,5 +1,6 @@
 var User = require('../models/user');
 var Friendship = require('../models/friendship');
+var FriendshipRequest = require('../models/friendshipRequest');
 
 module.exports = function(app, express) {
 	var apiRouter = express.Router();
@@ -7,12 +8,10 @@ module.exports = function(app, express) {
 	// Always find out who is making the request first
 	apiRouter.use(function(req, res, next) {
 		User.findOne({username: req.decoded.username}, function(err, user) {
-			if (!user) {
-				return dataBaseError(res);
-			} else {
-				req.user = user;
-				next();
-			}
+			if (err) throw err;
+			if (!user) return dataBaseError(res);
+			req.user = user;
+			next();
 		});
 	});
 
@@ -25,18 +24,40 @@ module.exports = function(app, express) {
 			User.findOne({username: req.params.user_name}, function(err, friend) {
 				if (err) throw err;
 				if (!friend) return dataBaseError(res);
-				var areFriends = isFriendsWith(req.user, friend);
-				console.log("RESULT: " + areFriends);
-				return res.json({success: true, username: friend.username, areFriends: areFriends});
+				var areFriends = req.user.isFriendsWith(friend);
+				if (!areFriends) {
+					return res.json({success: true, username: friend.username, areFriends: areFriends});
+				} else {
+					friend.getLastLocation(function(err, location) {
+						if (err) throw err;
+						if (!location) return dataBaseError(res);
+						return res.json({success: true, username: friend.username, areFriends: areFriends, location: location});
+					});
+				}
 			});
 		});
 
+	apiRouter.route('/requests/friendship/:request_id')
+		.put(function(req, res) {
+
+		})
+		.delete(function(req, res) {
+
+		});
+
+	apiRouter.post('/requests/friendship', function(req, res) {
+		var friendname = req.body.friend;
+		User.findOne({username: friendname}, function(err, friend) {
+			if (err) throw err;
+			if (!friend) return dataBaseError(res);
+			FriendshipRequest.createRequest(req.user, friend, function(success) {
+				return res.json({success: success});
+			});
+		});
+	});
+
 	return apiRouter;
 };
-
-function isFriendsWith(user, friend) {
-	return Friendship.findOne({user: user._id, friend: friend._id}).count() > 0;
-}
 
 function dataBaseError(res) {
 	return res.status(403).send({

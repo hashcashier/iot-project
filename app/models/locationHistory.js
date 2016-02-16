@@ -2,8 +2,8 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var LocationHistorySchema = new Schema({
-	user: {type: ObjectId, required: true},
-	location: {type: ObjectId, required: true},
+	user: {type: Schema.Types.ObjectId, required: true},
+	location: {type: Schema.Types.ObjectId, required: true},
 	registered: {type: Date, default: Date.now }
 });
 
