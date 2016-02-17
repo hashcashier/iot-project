@@ -16,6 +16,10 @@ module.exports = function(app, express) {
 	});
 
 	apiRouter.get('/', function(req, res) {
+		return res.json({success: true});
+	});
+
+	apiRouter.get('/me', function(req, res) {
 		return res.json({success: true, user: req.user});
 	});
 
@@ -35,60 +39,8 @@ module.exports = function(app, express) {
 			});
 		});
 
-	apiRouter.route('/requests/friendship/:request_id')
-		.put(function(req, res) {
-			FriendshipRequest.findOne({_id: req.params.request_id, target: req.user._id}, function(err, friendshipRequest) {
-				if (err || !friendshipRequest || friendshipRequest.responded) return errorResponse(res, err);
-
-				var respond = function() {
-					friendshipRequest.responded = true;
-					friendshipRequest.save(function(err) {
-						if (err) return errorResponse(res, err);
-						return res.json({success: true});
-					});
-				};
-
-				if (req.body.accept == 'yes') {
-					var friendship = new Friendship();
-					friendship.user = friendshipRequest.user;
-					friendship.friend = friendshipRequest.target;
-					friendship.save(function(err) {
-						if (err) return errorResponse(res, err);
-						var symmetricFriendship = new Friendship();
-						symmetricFriendship.friend = friendshipRequest.user;
-						symmetricFriendship.user = friendshipRequest.target;
-						symmetricFriendship.save(function(err) {
-							if (err) return errorResponse(res, err);
-							return respond();
-						});
-					});
-				} else {
-					return respond();
-				}
-			})
-		})
-		.delete(function(req, res) {
-			FriendshipRequest.remove({_id: req.params.request_id, user: req.user._id}, function(err) {
-				if (err) return errorResponse(res, err);
-				return res.json({success: true});
-			})
-		});
-
-	apiRouter.post('/requests/friendship', function(req, res) {
-		var friendname = req.body.friend;
-		User.findOne({username: friendname}, function(err, friend) {
-			if (err || !friend) return errorResponse(res, err);
-
-			var friendshipRequest = new FriendshipRequest();
-			friendshipRequest.user = req.user._id;
-			friendshipRequest.target = friend._id;
-			friendshipRequest.responded = false;
-			friendshipRequest.save(function(err) {
-				if (err)  return errorResponse(res, err);
-				else return res.json({sucess: true});
-			});
-		});
-	});
+	var friendshipRequestRoutes = require('./requestsFriendship')(app, express);
+	apiRouter.use('/requests/friendship', friendshipRequestRoutes);
 
 	return apiRouter;
 };
