@@ -1,7 +1,7 @@
 var User = require('../models/user');
 var Friendship = require('../models/friendship');
 var FriendshipRequest = require('../models/friendshipRequest');
-var mongoose= require('mongoose');
+var mongoose = require('mongoose');
 
 module.exports = function(app, express) {
 	var apiRouter = express.Router();
@@ -68,3 +68,8 @@ module.exports = function(app, express) {
 
 	return apiRouter;
 };
+
+function errorResponse(res, err) {
+	if (err) console.log(err);
+	return res.status(400).send({success: false});
+}
