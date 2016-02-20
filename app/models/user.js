@@ -26,14 +26,14 @@ UserSchema.methods.comparePassword = function(password) {
 	return bcrypt.compareSync(password, user.password);
 };
 
-UserSchema.methods.isFriendsWith = function(friend) {
+UserSchema.methods.isFriendsWith = function(friend, callback) {
 	var user = this;
-	return Friendship.findOne({user: user._id, friend: friend._id}).count() > 0;
+	Friendship.findOne({user: user._id, friend: friend._id}).count(callback);
 };
 
 UserSchema.methods.getLastLocation = function(callback) {
 	var user = this;
-	LocationHistory.find({user_id: user._id}).sort({registered: -1}).limit(1).exec(callback);
+	LocationHistory.find({user: user._id}).sort({registered: -1}).limit(1).exec(callback);
 };
 
 module.exports = mongoose.model('User', UserSchema);

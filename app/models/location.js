@@ -3,9 +3,9 @@ var Schema = mongoose.Schema;
 
 var LocationSchema = new Schema({
 	name: {type: String, required: true},
-	campus: {type: ObjectId, required: true},
+	campus: {type: Schema.Types.ObjectId, required: true},
 	public: Boolean,
-	beacons: [String],
+	beacon: {type: String, required: true, index: { unique: true }},
 	registered: {type: Date, default: Date.now }
 });
 

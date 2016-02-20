@@ -1,7 +1,6 @@
 var User = require('../models/user');
 var Friendship = require('../models/friendship');
 var FriendshipRequest = require('../models/friendshipRequest');
-var mongoose = require('mongoose');
 
 module.exports = function(app, express) {
 	var apiRouter = express.Router();

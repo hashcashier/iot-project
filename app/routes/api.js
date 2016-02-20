@@ -1,10 +1,31 @@
-var User = require('../models/user');
-var Friendship = require('../models/friendship');
-var FriendshipRequest = require('../models/friendshipRequest');
-var mongoose= require('mongoose');
+var User 	= require('../models/user');
+var jwt 	= require('jsonwebtoken');
 
 module.exports = function(app, express) {
 	var apiRouter = express.Router();
+
+	// Need a token to access the API
+	apiRouter.use(function(req, res, next) {
+		var token = req.body.token || req.query.token || req.headers['x-access-token'];
+		if (token) {
+			jwt.verify(token, app.get('config').secret, function(err, decoded) {
+				if (err) {
+					return res.status(403).send({
+						success: false,
+						message: 'Failed to authenticate token.'
+					});
+				} else {
+					req.decoded = decoded;
+					next();
+				}
+			});
+		} else {
+			return res.status(403).send({
+				success: false,
+				message: 'No token provided.'
+			});
+		}
+	});
 
 	// Always find out who is making the request first
 	apiRouter.use(function(req, res, next) {
@@ -19,25 +40,11 @@ module.exports = function(app, express) {
 		return res.json({success: true});
 	});
 
-	apiRouter.get('/me', function(req, res) {
-		return res.json({success: true, user: req.user});
-	});
+	var meRoutes = require('./me')(app, express);
+	apiRouter.use('/me', meRoutes);
 
-	apiRouter.route('/users/:user_name')
-		.get(function(req, res) {
-			User.findOne({username: req.params.user_name}, function(err, friend) {
-				if (err || !friend) return errorResponse(res, err);
-				var areFriends = req.user.isFriendsWith(friend);
-				if (!areFriends) {
-					return res.json({success: true, username: friend.username, areFriends: areFriends});
-				} else {
-					friend.getLastLocation(function(err, location) {
-						if (err || !location) return errorResponse(res, err);
-						return res.json({success: true, username: friend.username, areFriends: areFriends, location: location});
-					});
-				}
-			});
-		});
+	var usersRoutes = require('./users')(app, express);
+	apiRouter.use('/users', usersRoutes);
 
 	var friendshipRequestRoutes = require('./requestsFriendship')(app, express);
 	apiRouter.use('/requests/friendship', friendshipRequestRoutes);
