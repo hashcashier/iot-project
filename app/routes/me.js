@@ -1,4 +1,5 @@
 var User 			= require('../models/user');
+var Friendship 		= require('../models/friendship');
 var Location 		= require('../models/location');
 var LocationHistory = require('../models/locationHistory');
 
@@ -20,6 +21,16 @@ module.exports = function(app, express) {
 				if (err) return errorResponse(res, err);
 				return res.json({success: true});
 			})
+		});
+	});
+
+	meRouter.get('/friends', function(req, res) {
+		Friendship
+			.find({user: req.user._id})
+			.select('friend -_id')
+			.populate('friend', 'username -_id')
+			.exec(function(err, friendships) {
+				res.json({success: true, friends: friendships});
 		});
 	});
 
