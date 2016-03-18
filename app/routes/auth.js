@@ -10,7 +10,7 @@ module.exports = function(app, express) {
 				throw err;
 			}
 			if (!user || !user.comparePassword(req.body.password)) {
-				res.json({sucess: false})
+				res.json({success: false})
 			} else {
 				var token = jwt.sign({username: user.username}, app.get('config').secret, {expiresInMinutes: 1440});
 				res.json({success: true, token: token});

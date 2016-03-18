@@ -27,7 +27,7 @@ module.exports = function(app, express) {
 				friendshipRequest.responded = false;
 				friendshipRequest.save(function(err) {
 					if (err)  return errorResponse(res, err);
-					return res.json({sucess: true});
+					return res.json({success: true});
 				});
 			});
 		})
