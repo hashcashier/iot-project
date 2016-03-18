@@ -4,8 +4,8 @@ var Schema = mongoose.Schema;
 var Friendship = require('./friendship');
 
 var FriendshipRequestSchema = new Schema({
-	user: {type: Schema.Types.ObjectId, required: true},
-	target: {type: Schema.Types.ObjectId, required: true},
+	user: {type: Schema.Types.ObjectId, required: true, ref: 'User'},
+	target: {type: Schema.Types.ObjectId, required: true, ref: 'User'},
 	responded: Boolean,
 	registered: {type: Date, default: Date.now }
 });

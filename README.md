@@ -1,0 +1,10 @@
+POST 	/auth/login
+POST 	/auth/register
+GET 	/api/me
+POST 	/api/me/location
+GET 	/api/me/friends
+GET 	/api/users/:user_name
+GET 	/api/requests/friendship
+POST 	/api/requests/friendship
+PUT 	/api/requests/friendship/:request_id
+DELETE 	/api/requests/friendship/:request_id
