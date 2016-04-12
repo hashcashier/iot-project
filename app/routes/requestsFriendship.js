@@ -9,8 +9,8 @@ module.exports = function(app, express) {
 		.get(function(req, res) {
 			FriendshipRequest
 			.find({target: req.user._id, responded: false})
-			.select('target -_id')
-			.populate('target', 'username -_id')
+			.select('user _id')
+			.populate('user', 'username')
 			.exec(function(err, requests) {
 				if (err) return errorResponse(res, err);
 				return res.json({success: true, requests: requests});
