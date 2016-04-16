@@ -11,9 +11,11 @@ module.exports = function(app, express) {
 	});
 
 	meRouter.post('/location', function(req, res) {
-		if (!req.body.beacons)
+		if (!req.body.beacons) {
+			console.log("NO BEACONS SENT. AVOIDED SPLIT ON UNDEFINED.")
 			return res.json({success: false});
-		
+		}
+
 		var beacons = req.body.beacons.split(",");
 		console.log(beacons)
 
