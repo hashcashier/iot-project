@@ -13,9 +13,11 @@ module.exports = function(app, express) {
 					if (!areFriends) {
 						return res.json({success: true, username: friend.username, areFriends: areFriends});
 					} else {
+						console.log("LOCATION: ")
 						friend.getLastLocation(function(err, location) {
 							if (err || !location) return errorResponse(res, err);
-							return res.json({success: true, username: friend.username, areFriends: areFriends, location: location});
+							console.log(location.name)
+							return res.json({success: true, username: friend.username, areFriends: areFriends, location: location.name});
 						});
 					}
 				});
