@@ -15,14 +15,13 @@ module.exports = function(app, express) {
 					} else {
 						console.log("LOCATION: ")
 						friend.getLastLocation(function(err, locationHist) {
-							if (err || !locationHist) return errorResponse(res, err);
-							console.log(locationHist)
-							console.log(locationHist.location)
+							if (err || !locationHist || locationHist.length == 0) return errorResponse(res, err);
+							console.log(locationHist[0].location.name)
 							return res.json({
 								success: true,
 								username: friend.username,
 								areFriends: areFriends,
-								location: locationHist.location.name});
+								location: locationHist[0].location.name});
 						});
 					}
 				});
