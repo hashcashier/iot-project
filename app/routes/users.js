@@ -16,7 +16,8 @@ module.exports = function(app, express) {
 						console.log("LOCATION: ")
 						friend.getLastLocation(function(err, locationHist) {
 							if (err || !locationHist) return errorResponse(res, err);
-							console.log(locationHist.location.name)
+							console.log(locationHist)
+							console.log(locationHist.location)
 							return res.json({
 								success: true,
 								username: friend.username,
