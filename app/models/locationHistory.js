@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var LocationHistorySchema = new Schema({
 	user: {type: Schema.Types.ObjectId, required: true},
-	location: {type: Schema.Types.ObjectId, required: true},
+	location: {type: Schema.Types.ObjectId, required: true, ref: 'Location'},
 	registered: {type: Date, default: Date.now }
 });
 

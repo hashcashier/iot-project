@@ -14,10 +14,14 @@ module.exports = function(app, express) {
 						return res.json({success: true, username: friend.username, areFriends: areFriends});
 					} else {
 						console.log("LOCATION: ")
-						friend.getLastLocation(function(err, location) {
-							if (err || !location) return errorResponse(res, err);
-							console.log(location.name)
-							return res.json({success: true, username: friend.username, areFriends: areFriends, location: location.name});
+						friend.getLastLocation(function(err, locationHist) {
+							if (err || !locationHist) return errorResponse(res, err);
+							console.log(locationHist.location.name)
+							return res.json({
+								success: true,
+								username: friend.username,
+								areFriends: areFriends,
+								location: locationHist.location.name});
 						});
 					}
 				});
