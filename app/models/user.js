@@ -35,7 +35,7 @@ UserSchema.methods.getLastLocation = function(callback) {
 	var user = this;
 	LocationHistory
 		.find({user: user._id})
-		.populate('location')
+		.populate('location', 'name')
 		.sort({registered: -1})
 		.limit(1)
 		.exec(callback);
