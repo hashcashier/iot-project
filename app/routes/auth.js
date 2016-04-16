@@ -39,6 +39,7 @@ module.exports = function(app, express) {
 	authRouter.get('/logout', function(req, res) {
 		//req.logout();
 		//res.redirect('/');
+		return res.json({success: true});
 	});
 
 	return authRouter;
