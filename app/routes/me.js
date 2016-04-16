@@ -13,6 +13,8 @@ module.exports = function(app, express) {
 	meRouter.post('/location', function(req, res) {
 		var beacons = req.body.beacons.split(",");
 		console.log(beacons)
+		if (!beacons)
+			return res.json({success: false});
 
 		Location.find({beacon: {$in: beacons} }, function(err, locations) {
 			if (err || !locations || locations.length == 0)
