@@ -13,7 +13,6 @@ import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.sparql.vocabulary.FOAF;
 
 public class FriendFinderOntology {
@@ -36,6 +35,8 @@ public class FriendFinderOntology {
 
 	private static HashMap<User, Individual> userMap = new HashMap<User, Individual>();
 	private static HashMap<Campus, Individual> campusMap = new HashMap<Campus, Individual>();
+	private static HashMap<Location, Individual> locationMap = new HashMap<Location, Individual>();
+	private static HashMap<String, Individual> beaconMap = new HashMap<String, Individual>();
 
 	public static void createIndividuals(World world) {
 		createOntology();
@@ -90,7 +91,19 @@ public class FriendFinderOntology {
 	}
 
 	public static void createLocationIndividuals(ArrayList<Location> locations) {
-		
+		for (int i=0; i<locations.size(); i++) {
+			Location location = locations.get(i);
+			Individual locationIndividual = locationClass.createIndividual(NS + "location");
+			locationMap.put(location, locationIndividual);
+			locationIndividual.addProperty(FOAF.name, location.name);
+			locationIndividual.addProperty(FOAF.based_near, campusMap.get(location.campus));
+
+			Individual beaconIndividual = beaconClass.createIndividual(NS + "beacon");
+			beaconMap.put(location.beacon, beaconIndividual);
+			beaconIndividual.addProperty(FOAF.name, location.beacon);
+
+			beaconIndividual.addProperty(FOAF.based_near, locationIndividual);
+		}
 	}
 
 	public static void createUserIndividuals(ArrayList<User> users) {
@@ -117,6 +130,10 @@ public class FriendFinderOntology {
 				}
 				userIndividual.addProperty(reqFriendsWith, userMap.get(friend));
 			}
+			Location latestLocation = user.locationHistory.get(0).time.after(user.locationHistory.get(user.locationHistory.size()-1).time)
+					? user.locationHistory.get(0).location : user.locationHistory.get(user.locationHistory.size()-1).location;
+			Individual locationIndividual = locationMap.get(latestLocation);
+			userIndividual.addProperty(FOAF.based_near, locationIndividual);
 		}
 	}
 }
