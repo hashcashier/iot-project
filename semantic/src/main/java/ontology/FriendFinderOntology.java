@@ -17,7 +17,7 @@ import org.apache.jena.sparql.vocabulary.FOAF;
 
 public class FriendFinderOntology {
 
-	private static OntModel om;
+	public static OntModel om;
 
 	private static OntClass sensingDeviceClass;
 	private static OntClass mobileClass;
