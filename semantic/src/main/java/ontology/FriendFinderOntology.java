@@ -84,7 +84,7 @@ public class FriendFinderOntology {
 	public static void createCampusIndividuals(ArrayList<Campus> campuses) {
 		for (int i=0; i<campuses.size(); i++) {
 			Campus campus = campuses.get(i);
-			Individual campusIndividual = campusClass.createIndividual(NS + "campus");
+			Individual campusIndividual = campusClass.createIndividual(NS + "campus" + i);
 			campusMap.put(campus, campusIndividual);
 			campusIndividual.addProperty(FOAF.name, campus.name);
 		}
@@ -93,7 +93,7 @@ public class FriendFinderOntology {
 	public static void createLocationIndividuals(ArrayList<Location> locations) {
 		for (int i=0; i<locations.size(); i++) {
 			Location location = locations.get(i);
-			Individual locationIndividual = locationClass.createIndividual(NS + "location");
+			Individual locationIndividual = locationClass.createIndividual(NS + "location" + i);
 			locationMap.put(location, locationIndividual);
 			locationIndividual.addProperty(FOAF.name, location.name);
 			locationIndividual.addProperty(FOAF.based_near, campusMap.get(location.campus));
@@ -108,10 +108,12 @@ public class FriendFinderOntology {
 	public static void createUserIndividuals(ArrayList<User> users) {
 		for (int i=0; i<users.size(); i++) {
 			User user = users.get(i);
-			Individual userIndividual = om.createIndividual(FOAF.NS + "person" + i, FOAF.Person);
-			userMap.put(user, userIndividual);
-			userIndividual.addProperty(FOAF.name, om.createLiteral(user.username));
-
+			Individual userIndividual = userMap.get(user);
+			if(userIndividual == null){
+				userIndividual = om.createIndividual(FOAF.NS + "person" + i, FOAF.Person);
+				userMap.put(user, userIndividual);
+				userIndividual.addProperty(FOAF.name, om.createLiteral(user.username));
+			}
 			for (int j=0; j<user.friends.size(); j++) {
 				User friend = user.friends.get(j);
 				if (!userMap.containsKey(friend)) {
