@@ -16,6 +16,7 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -67,7 +68,7 @@ class RootHandler implements HttpHandler {
          public void handle(HttpExchange he) throws IOException {
                  String response = "<h1>Friends Finder Ontology</h1>"
                  		+ "<br/>"
-                 		+ "<form action='query'><textarea name='q' rows='4' cols='50'></textarea><input type='submit'/></form>";
+                 		+ "<form action='query'><textarea name='q' rows='20' cols='60'></textarea><br/><input type='submit'/></form>";
                  he.sendResponseHeaders(200, response.length());
                  OutputStream os = he.getResponseBody();
                  os.write(response.getBytes());
@@ -87,34 +88,35 @@ class EchoGetHandler implements HttpHandler {
                  parseQuery(query, parameters);
 
                  // send response
-                 String response = "";
                  String squery = (String) parameters.get("q");
                  World world = Mirror.getWorld();
                  FriendFinderOntology.createIndividuals(world);
-                 Model m = FriendFinderOntology.om;
-                 System.out.println("");
-                 String result = "Result: ";
 
-                 Query jenaquery = QueryFactory.create(squery);
-                 QueryExecution qexec = QueryExecutionFactory.create(jenaquery, m);
+                 Model m = FriendFinderOntology.om;
+
+                 OutputStream out = he.getResponseBody();
+
+                 String response = "<h1>Friends Finder Ontology</h1>"
+                 		+ "<br/>"
+                 		+ "<form action='query'><textarea name='q' rows='20' cols='60'>" + squery + "</textarea><br/><input type='submit'/></form>";
+
                  try {
+                     Query jenaquery = QueryFactory.create(squery);
+                     QueryExecution qexec = QueryExecutionFactory.create(jenaquery, m);
                      ResultSet results = qexec.execSelect();
-                     while ( results.hasNext() ) {
-                         result = result + "\n" + results.nextSolution().toString();
-                     }
-                 } finally {
+
+                     response += ResultSetFormatter.asText(results, jenaquery).replace("\n", "<br/>").replace(" ", "&nbsp;");
                      qexec.close();
+
+                 } catch(Exception e){
+                     response += "Compile Error :<br />" + e.getLocalizedMessage();
                  }
 
-                 response = result;
-
-//                 for (String key : parameters.keySet())
-//                          response += key + " = " + parameters.get(key) + "\n";
                  he.sendResponseHeaders(200, response.length());
-                 OutputStream os = he.getResponseBody();
-                 os.write(response.toString().getBytes());
+                 out.write(response.getBytes());
+                 out.close();
+                 he.close();
 
-                 os.close();
          }
 
 
