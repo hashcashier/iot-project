@@ -101,7 +101,6 @@ public class FriendFinderOntology {
 			Individual beaconIndividual = beaconClass.createIndividual(NS + "beacon");
 			beaconMap.put(location.beacon, beaconIndividual);
 			beaconIndividual.addProperty(FOAF.name, location.beacon);
-
 			beaconIndividual.addProperty(FOAF.based_near, locationIndividual);
 		}
 	}
