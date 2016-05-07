@@ -112,6 +112,7 @@ public class FriendFinderOntology {
 			Individual userIndividual = om.createIndividual(FOAF.NS + "person" + i, FOAF.Person);
 			userMap.put(user, userIndividual);
 			userIndividual.addProperty(FOAF.name, om.createLiteral(user.username));
+
 			for (int j=0; j<user.friends.size(); j++) {
 				User friend = user.friends.get(j);
 				if (!userMap.containsKey(friend)) {
@@ -121,6 +122,7 @@ public class FriendFinderOntology {
 				}
 				userIndividual.addProperty(FOAF.knows, userMap.get(friend));
 			}
+
 			for (int j=0; j<user.pendingOutgoingRequests.size(); j++) {
 				User friend = user.pendingOutgoingRequests.get(j);
 				if (!userMap.containsKey(friend)) {
@@ -130,10 +132,15 @@ public class FriendFinderOntology {
 				}
 				userIndividual.addProperty(reqFriendsWith, userMap.get(friend));
 			}
+
 			Location latestLocation = user.locationHistory.get(0).time.after(user.locationHistory.get(user.locationHistory.size()-1).time)
 					? user.locationHistory.get(0).location : user.locationHistory.get(user.locationHistory.size()-1).location;
 			Individual locationIndividual = locationMap.get(latestLocation);
 			userIndividual.addProperty(FOAF.based_near, locationIndividual);
+
+			Individual mobileIndividual = mobileClass.createIndividual(NS + "mobile");
+			userIndividual.addProperty(hasDevice, mobileIndividual);
+			mobileIndividual.addProperty(FOAF.based_near, beaconMap.get(latestLocation.beacon));
 		}
 	}
 }
