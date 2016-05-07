@@ -3,17 +3,17 @@ package ontology;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import models.Campus;
-import models.Location;
-import models.User;
-import models.World;
-
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntProperty;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.sparql.vocabulary.FOAF;
+
+import models.Campus;
+import models.Location;
+import models.User;
+import models.World;
 
 public class FriendFinderOntology {
 
@@ -78,7 +78,7 @@ public class FriendFinderOntology {
 		locationClass.addProperty(FOAF.based_near, campusClass);
 		beaconClass.addProperty(FOAF.based_near, locationClass);
 
-		om.write(System.out);
+		//om.write(System.out);
 	}
 
 	public static void createCampusIndividuals(ArrayList<Campus> campuses) {
@@ -132,14 +132,18 @@ public class FriendFinderOntology {
 				userIndividual.addProperty(reqFriendsWith, userMap.get(friend));
 			}
 
-			Location latestLocation = user.locationHistory.get(0).time.after(user.locationHistory.get(user.locationHistory.size()-1).time)
-					? user.locationHistory.get(0).location : user.locationHistory.get(user.locationHistory.size()-1).location;
-			Individual locationIndividual = locationMap.get(latestLocation);
-			userIndividual.addProperty(FOAF.based_near, locationIndividual);
+			if(user.locationHistory.size() > 0){
+                Location latestLocation = user.locationHistory.get(0).time.after(user.locationHistory.get(user.locationHistory.size()-1).time)
+                        ? user.locationHistory.get(0).location : user.locationHistory.get(user.locationHistory.size()-1).location;
+                Individual locationIndividual = locationMap.get(latestLocation);
+                userIndividual.addProperty(FOAF.based_near, locationIndividual);
 
-			Individual mobileIndividual = mobileClass.createIndividual(NS + "mobile");
-			userIndividual.addProperty(hasDevice, mobileIndividual);
-			mobileIndividual.addProperty(FOAF.based_near, beaconMap.get(latestLocation.beacon));
+                Individual mobileIndividual = mobileClass.createIndividual(NS + "mobile");
+                userIndividual.addProperty(hasDevice, mobileIndividual);
+                mobileIndividual.addProperty(FOAF.based_near, beaconMap.get(latestLocation.beacon));
+			}
+
+
 		}
 	}
 }

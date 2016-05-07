@@ -7,7 +7,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.bson.Document;
 
 import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 import models.Campus;
@@ -50,15 +49,15 @@ public class Mirror {
         MongoClient client = new MongoClient();
         MongoDatabase db = client.getDatabase("friend-finder");
 
-        System.out.println("Starting a database dump ...");
-        for(String colName : db.listCollectionNames()){
-            if(colName.equals("system.indexes")) continue;
-            System.out.println("================== " + colName + " ======================");
-            MongoCollection<Document> collection = db.getCollection(colName);
-            for(Document d : collection.find()){
-                System.out.println(d.toJson());
-            }
-        }
+//        System.out.println("Starting a database dump ...");
+//        for(String colName : db.listCollectionNames()){
+//            if(colName.equals("system.indexes")) continue;
+//            System.out.println("================== " + colName + " ======================");
+//            MongoCollection<Document> collection = db.getCollection(colName);
+//            for(Document d : collection.find()){
+//                System.out.println(d.toJson());
+//            }
+//        }
 
         // Populate the users array
         ArrayList<User> users = new ArrayList<User>();
@@ -111,7 +110,7 @@ public class Mirror {
         }
 
         // Building location history
-        for(Document doc : db.getCollection("locationhistory").find()){
+        for(Document doc : db.getCollection("locationhistories").find()){
             LocationHistory h = new LocationHistory();
             h.location = getLocationById(locations, doc.getObjectId("location").toString());
             h.time = doc.getDate("registered");
