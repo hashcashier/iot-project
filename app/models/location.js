@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 var LocationSchema = new Schema({
 	name: {type: String, required: true},
-	campus: {type: Schema.Types.ObjectId, required: true},
+	campus: {type: Schema.Types.ObjectId, required: true, ref: 'Campus'},
 	public: Boolean,
 	beacon: {type: String, required: true, index: { unique: true }},
 	registered: {type: Date, default: Date.now }

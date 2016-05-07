@@ -11,16 +11,48 @@ module.exports = function(app, express) {
 	});
 
 	meRouter.post('/location', function(req, res) {
-		var beacon = req.body.beacon;
-		Location.findOne({beacon: beacon}, function(err, location) {
-			if (err || !location) return errorResponse(res, err);
-			var locationHistory = new LocationHistory();
-			locationHistory.user 		= req.user._id;
-			locationHistory.location 	= location._id;
-			locationHistory.save(function(err) {
-				if (err) return errorResponse(res, err);
-				return res.json({success: true});
-			})
+		if (!req.body.beacons) {
+			console.log("NO BEACONS SENT. AVOIDED SPLIT ON UNDEFINED.")
+			return res.json({success: false});
+		}
+
+		var beacons = req.body.beacons.split(",");
+		console.log(beacons)
+
+		Location.find({beacon: {$in: beacons} }, function(err, locations) {
+			if (err || !locations || locations.length == 0)
+				return errorResponse(res, err);
+			console.log(locations)
+
+			var done = false;
+			//for (var beacon in beacons) {
+			for (var i = 0; i < beacons.length; i++) {
+				var beacon = beacons[i]
+				console.log("BEACON")
+				console.log(beacon)
+				locations.forEach(function(location) {
+				console.log("LOCATION")
+					console.log(location)
+
+					if (location.beacon != beacon) {
+						return;
+					}
+
+					console.log(location)
+
+					var locationHistory = new LocationHistory();
+					locationHistory.user 		= req.user._id;
+					locationHistory.location 	= location._id;
+					locationHistory.save(function(err) {
+						if (err) return errorResponse(res, err);
+						return res.json({success: true, location: location.name});
+					})
+					done = true;
+				})
+
+				if (done)
+					break;
+			}
 		});
 	});
 

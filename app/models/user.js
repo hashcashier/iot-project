@@ -33,7 +33,12 @@ UserSchema.methods.isFriendsWith = function(friend, callback) {
 
 UserSchema.methods.getLastLocation = function(callback) {
 	var user = this;
-	LocationHistory.find({user: user._id}).sort({registered: -1}).limit(1).exec(callback);
+	LocationHistory
+		.find({user: user._id})
+		.populate('location', 'name')
+		.sort({registered: -1})
+		.limit(1)
+		.exec(callback);
 };
 
 module.exports = mongoose.model('User', UserSchema);
