@@ -1,5 +1,7 @@
 package semantic;
 
+import ontology.FriendFinderOntology;
+import models.World;
 import semantic.mirror.Mirror;
 
 public class Main {
@@ -25,7 +27,7 @@ public class Main {
 
         // You have to wait until the thread is started...
         Thread.sleep(1 * 1000);
-        Mirror.getWorld();
-
+        World world = Mirror.getWorld();
+        FriendFinderOntology.createIndividuals(world);
     }
 }
