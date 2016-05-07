@@ -1,13 +1,15 @@
 package server;
 
-import java.util.*;
-
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpServer;
-
-import java.net.*;
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
@@ -16,13 +18,37 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpServer;
+
+import models.World;
 import ontology.FriendFinderOntology;
 import semantic.mirror.Mirror;
-import models.World;
 
 public class Server {
-  
-	public static void main(String[] args) throws IOException {
+
+
+    static Runnable worldBuilderRunnable = new Runnable() {
+
+        public void run() {
+            try {
+                while(true){
+                    Mirror.buildWord();
+                    Thread.sleep(3 * 1000);
+                }
+            } catch (InterruptedException e) {
+            }
+        }
+    };
+
+	public static void main(String[] args) throws IOException, InterruptedException {
+
+        Thread worldBuilder = new Thread(worldBuilderRunnable);
+        worldBuilder.start();
+
+        Thread.sleep(1000);
+
 		int port = 9000;
 		HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
 		System.out.println("server started at " + port);
@@ -37,7 +63,7 @@ class RootHandler implements HttpHandler {
 
         int port = 9000;
 
-         
+
          public void handle(HttpExchange he) throws IOException {
                  String response = "<h1>Friends Finder Ontology</h1>"
                  		+ "<br/>"
@@ -68,7 +94,7 @@ class EchoGetHandler implements HttpHandler {
                  Model m = FriendFinderOntology.om;
                  System.out.println("");
                  String result = "Result: ";
-                 
+
                  Query jenaquery = QueryFactory.create(squery);
                  QueryExecution qexec = QueryExecutionFactory.create(jenaquery, m);
                  try {
@@ -79,9 +105,9 @@ class EchoGetHandler implements HttpHandler {
                  } finally {
                      qexec.close();
                  }
-                
+
                  response = result;
-                 
+
 //                 for (String key : parameters.keySet())
 //                          response += key + " = " + parameters.get(key) + "\n";
                  he.sendResponseHeaders(200, response.length());
@@ -92,7 +118,7 @@ class EchoGetHandler implements HttpHandler {
          }
 
 
-public static void parseQuery(String query, Map<String, 
+public static void parseQuery(String query, Map<String,
 	Object> parameters) throws UnsupportedEncodingException {
 
          if (query != null) {
@@ -102,12 +128,12 @@ public static void parseQuery(String query, Map<String,
                           String key = null;
                           String value = null;
                           if (param.length > 0) {
-                          key = URLDecoder.decode(param[0], 
+                          key = URLDecoder.decode(param[0],
                           	System.getProperty("file.encoding"));
                           }
 
                           if (param.length > 1) {
-                                   value = URLDecoder.decode(param[1], 
+                                   value = URLDecoder.decode(param[1],
                                    System.getProperty("file.encoding"));
                           }
 
