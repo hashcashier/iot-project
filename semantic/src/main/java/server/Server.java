@@ -15,8 +15,8 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QueryExecutionFactory;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
-import org.apache.jena.query.ResultSetFormatter;
 import org.apache.jena.rdf.model.Model;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -93,10 +93,11 @@ class EchoGetHandler implements HttpHandler {
                  FriendFinderOntology.createIndividuals(world);
 
                  Model m = FriendFinderOntology.om;
+                 m.write(System.out, "N-TRIPLE");
 
                  OutputStream out = he.getResponseBody();
 
-                 String response = "<h1>Friends Finder Ontology</h1>"
+                 String response = "<style></style><h1>Friends Finder Ontology</h1>"
                  		+ "<br/>"
                  		+ "<form action='query'><textarea name='q' rows='20' cols='60'>" + squery + "</textarea><br/><input type='submit'/></form>";
 
@@ -105,7 +106,29 @@ class EchoGetHandler implements HttpHandler {
                      QueryExecution qexec = QueryExecutionFactory.create(jenaquery, m);
                      ResultSet results = qexec.execSelect();
 
-                     response += ResultSetFormatter.asText(results, jenaquery).replace("\n", "<br/>").replace(" ", "&nbsp;");
+                     response += "<table border='1'>";
+                     List<String> vars = results.getResultVars();
+
+                     response += "<tr>";
+                     for(String v : vars){
+                         response += "<td>";
+                         response += v;
+                         response += "</td>";
+                     }
+                     response += "</tr>";
+
+                     while(results.hasNext()){
+                         QuerySolution sol = results.next();
+                         response += "<tr>";
+                         for(String v : vars){
+                             response += "<td>";
+                             response += sol.get(v);
+                             response += "</td>";
+                         }
+                         response += "</tr>";
+                     }
+                     response += "</table>";
+
                      qexec.close();
 
                  } catch(Exception e){
