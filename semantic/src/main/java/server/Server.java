@@ -90,9 +90,8 @@ class EchoGetHandler implements HttpHandler {
                  // send response
                  String squery = (String) parameters.get("q");
                  World world = Mirror.getWorld();
-                 FriendFinderOntology.createIndividuals(world);
+                 Model m = FriendFinderOntology.createIndividuals(world);
 
-                 Model m = FriendFinderOntology.om;
                  m.write(System.out, "N-TRIPLE");
 
                  OutputStream out = he.getResponseBody();

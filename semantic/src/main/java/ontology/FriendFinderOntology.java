@@ -17,35 +17,37 @@ import models.World;
 
 public class FriendFinderOntology {
 
-	public static OntModel om;
+	private OntModel om;
 
-	private static OntClass sensingDeviceClass;
-	private static OntClass mobileClass;
-	private static OntClass campusClass;
-	private static OntClass platformClass;
-	private static OntClass locationClass;
-	private static OntClass deploymentClass;
-	private static OntClass beaconClass;
+	private OntClass sensingDeviceClass;
+	private OntClass mobileClass;
+	private OntClass campusClass;
+	private OntClass platformClass;
+	private OntClass locationClass;
+	private OntClass deploymentClass;
+	private OntClass beaconClass;
 
-	private static OntProperty reqFriendsWith;
-	private static OntProperty hasDevice;
+	private OntProperty reqFriendsWith;
+	private OntProperty hasDevice;
 
-	private static String NS;
-	private static String SSN;
+	private String NS;
+	private String SSN;
 
-	private static HashMap<User, Individual> userMap = new HashMap<User, Individual>();
-	private static HashMap<Campus, Individual> campusMap = new HashMap<Campus, Individual>();
-	private static HashMap<Location, Individual> locationMap = new HashMap<Location, Individual>();
-	private static HashMap<String, Individual> beaconMap = new HashMap<String, Individual>();
+	private HashMap<User, Individual> userMap = new HashMap<User, Individual>();
+	private HashMap<Campus, Individual> campusMap = new HashMap<Campus, Individual>();
+	private HashMap<Location, Individual> locationMap = new HashMap<Location, Individual>();
+	private HashMap<String, Individual> beaconMap = new HashMap<String, Individual>();
 
-	public static void createIndividuals(World world) {
-		createOntology();
-		createCampusIndividuals(world.campuses);
-		createLocationIndividuals(world.locations);
-		createUserIndividuals(world.users);
+	public static OntModel createIndividuals(World world) {
+	    FriendFinderOntology fm = new FriendFinderOntology();
+		fm.createOntology();
+		fm.createCampusIndividuals(world.campuses);
+		fm.createLocationIndividuals(world.locations);
+		fm.createUserIndividuals(world.users);
+		return fm.om;
 	}
 
-	public static void createOntology() {
+	public void createOntology() {
 		om = ModelFactory.createOntologyModel();
 		NS = "http://met.guc.edu.eg/friend-finder#";
 		SSN = "http://purl.oclc.org/NET/ssnx/ssn#";
@@ -81,7 +83,7 @@ public class FriendFinderOntology {
 		//om.write(System.out);
 	}
 
-	public static void createCampusIndividuals(ArrayList<Campus> campuses) {
+	public void createCampusIndividuals(ArrayList<Campus> campuses) {
 		for (int i=0; i<campuses.size(); i++) {
 			Campus campus = campuses.get(i);
 			Individual campusIndividual = campusClass.createIndividual(NS + "campus" + i);
@@ -90,7 +92,7 @@ public class FriendFinderOntology {
 		}
 	}
 
-	public static void createLocationIndividuals(ArrayList<Location> locations) {
+	public void createLocationIndividuals(ArrayList<Location> locations) {
 		for (int i=0; i<locations.size(); i++) {
 			Location location = locations.get(i);
 			Individual locationIndividual = locationClass.createIndividual(NS + "location" + i);
@@ -105,7 +107,7 @@ public class FriendFinderOntology {
 		}
 	}
 
-	public static void createUserIndividuals(ArrayList<User> users) {
+	public void createUserIndividuals(ArrayList<User> users) {
 		for (int i=0; i<users.size(); i++) {
 			User user = users.get(i);
 			Individual userIndividual = userMap.get(user);
